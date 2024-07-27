@@ -17,10 +17,9 @@ import AddCardIcon from '@mui/icons-material/AddCard'
 import Button from '@mui/material/Button'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
-import theme from '~/theme'
 
 
-function Column() {
+function Column({ column }) {
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
   const handleClick = (event) => {
@@ -56,7 +55,7 @@ function Column() {
 
             }}
           >
-            Column Title
+            {column.title}
           </Typography>
           <Box>
             <Tooltip title='More options'>
@@ -109,7 +108,7 @@ function Column() {
         </Box>
 
         {/* ListCards */}
-        <ListCards />
+        <ListCards cards={column.cards} />
         {/* Box Column Footer */}
         <Box sx={{
           height: (theme) => theme.trello.columnFooterHeight,
