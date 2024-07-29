@@ -7,7 +7,7 @@ export const mockData = {
     type: 'public', // 'private'
     ownerIds: [], // Những users là Admin của board
     memberIds: [], // Những users là member bình thường của board
-    columnOrderIds: ['column-id-01', 'column-id-02', 'column-id-03'],
+    columnOrderIds: ['column-id-03', 'column-id-01', 'column-id-02'],
     columns: [
       {
         _id: 'column-id-01',
