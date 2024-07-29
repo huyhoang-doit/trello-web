@@ -17,6 +17,7 @@ import AddCardIcon from '@mui/icons-material/AddCard'
 import Button from '@mui/material/Button'
 import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
+import { mapOrder } from '~/utils/sorts'
 
 
 function Column({ column }) {
@@ -28,6 +29,8 @@ function Column({ column }) {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const orderedCards = mapOrder(column.cards, column.cardOrderIds, '_id')
   return (
     <>
       <Box sx={{
@@ -108,7 +111,7 @@ function Column({ column }) {
         </Box>
 
         {/* ListCards */}
-        <ListCards cards={column.cards} />
+        <ListCards cards={orderedCards} />
         {/* Box Column Footer */}
         <Box sx={{
           height: (theme) => theme.trello.columnFooterHeight,
