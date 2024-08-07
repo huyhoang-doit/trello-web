@@ -23,7 +23,7 @@ import { CSS } from '@dnd-kit/utilities'
 
 
 function Column({ column }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: column._id,
     data: { ...column }
   })
@@ -34,8 +34,12 @@ function Column({ column }) {
     // Nếu sử dụng CSS.Transform như docs thì sẽ lỗi kiểu Stretch
     // https://github.com/clauderic/dnd-kit/issues/117
     transform: CSS.Translate.toString(transform),
-    transition
-  };
+    transition,
+    // Chiều cao phải luôn max 100% vì nếu không sẽ lỗi lúc kéo column ngắn qua một column dài thì phải kéo ở khu vực giữa rất khó chịu
+    // Lưu ý lúc này phải kết hợp với {...listener} nằm ở Box chứ không phải ở thẻ div ngoài cùng để tránh trường hợp kéo vào vùng trong suốt
+    height: '100%',
+    opacity: isDragging ? 0.5 : undefined
+  }
 
   const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
@@ -47,12 +51,11 @@ function Column({ column }) {
   }
 
   const orderedCards = mapOrder(column.cards, column.cardOrderIds, '_id')
+
+  // Phải bọc thẻ div vì vấn đề chiều cao của column khi kéo thả sẽ có bug kiều flickering
   return (
-    <>
+    <div ref={setNodeRef} style={dndKitColumnStyles} {...attributes} >
       <Box
-        ref={setNodeRef}
-        style={dndKitColumnStyles}
-        {...attributes}
         {...listeners}
         sx={{
           minWidth: '300px',
@@ -148,7 +151,7 @@ function Column({ column }) {
           </Tooltip>
         </Box>
       </Box>
-    </>
+    </div>
   )
 }
 
