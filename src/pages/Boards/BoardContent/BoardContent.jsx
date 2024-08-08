@@ -10,10 +10,14 @@ import {
   useSensors,
   DragOverlay,
   closestCorners,
-  defaultDropAnimationSideEffects
+  closestCenter,
+  defaultDropAnimationSideEffects,
+  pointerWithin,
+  rectIntersection,
+  getFirstCollision
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cloneDeep } from 'lodash'
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
@@ -46,6 +50,9 @@ function BoardContent({ board }) {
   const [activeDragItemType, setActiveDragItemType] = useState(null)
   const [activeDragItemData, setActiveDragItemData] = useState(null)
   const [oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard] = useState(null)
+
+  // Điểm va chạm cuối cùng (xử lý thuật toán phát hiện va chạm)
+  const lastOverId = useRef(null)
 
   useEffect(() => {
     const orderedColumns = mapOrder(board.columns, board.columnOrderIds, '_id')
@@ -263,13 +270,49 @@ function BoardContent({ board }) {
   const customDropAnimation = {
     sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.5' } } })
   }
+
+  // Custom lại thuật toán phát hiện va chạm
+  const collisionDetectionStrategy = useCallback((args) => {
+    if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
+      return closestCorners({ ...args })
+    }
+
+    // Tìm các điểm va chạm với con trỏ
+    const pointerIntersections = pointerWithin(args)
+
+    // Thuật toán phát hiện va chạm trả về một mảng các va chạm ở đây
+    const intersections = pointerIntersections?.length > 0
+      ? pointerIntersections
+      : rectIntersection(args)
+
+    // Tìm overId trong mảng intersections trên
+    let overId = getFirstCollision(intersections, 'id')
+
+    if (overId) {
+      const checkColumn = orderedColumns.find(column => column._id === overId)
+
+      if (checkColumn) {
+        overId = closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter(container => {
+            return (container.id !== overId) && (checkColumn?.cardOrderIds?.includes(container.id))
+          })
+        })[0]?.id
+      }
+
+      lastOverId.current = overId
+      return [{ id: overId }]
+    }
+    return lastOverId.current ? [{ id: lastOverId.current }] : []
+
+  }, [activeDragItemType])
   return (
     <DndContext
       // Cảm biến va chạm
       sensors={mySensors}
       // Thuật toán phát hiện va chạm
       // https://docs.dndkit.com/api-documentation/context-provider/collision-detection-algorithms
-      collisionDetection={closestCorners}
+      collisionDetection={collisionDetectionStrategy}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd} >
