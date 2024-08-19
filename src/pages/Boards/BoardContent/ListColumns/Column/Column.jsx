@@ -32,7 +32,7 @@ function Column({ column }) {
 
   const dndKitColumnStyles = {
 
-    // touchAction: 'none',// Dành cho sensor default dạng pointer senser
+    // touchAction: 'none', // Dành cho sensor default dạng pointer senser
     // Nếu sử dụng CSS.Transform như docs thì sẽ lỗi kiểu Stretch
     // https://github.com/clauderic/dnd-kit/issues/117
     transform: CSS.Translate.toString(transform),
@@ -58,9 +58,7 @@ function Column({ column }) {
   const [newCardTitle, setNewCardTitle] = useState('')
 
   const toggleOpenNewCardForm = () => {
-    console.log('Before toggling:', openNewCardForm)
     setOpenNewCardForm(!openNewCardForm)
-    console.log('After toggling:', !openNewCardForm)
   }
 
   const addNewCard = () => {
@@ -174,7 +172,7 @@ function Column({ column }) {
             }}
             >
 
-              <Button startIcon={<AddCardIcon />} onClick={toggleOpenNewCardForm} >Add new card</Button>
+              <Button startIcon={<AddCardIcon />} onMouseDown={toggleOpenNewCardForm} >Add new card</Button>
               <Tooltip title='Drag to move'>
                 <DragHandleIcon sx={{ cursor: 'pointer' }} />
               </Tooltip>
@@ -191,6 +189,7 @@ function Column({ column }) {
                 size='small'
                 variant='outlined'
                 autoFocus
+                data-no-dnd='true'
                 value={newCardTitle}
                 onChange={(e) => setNewCardTitle(e.target.value)}
                 sx={{
@@ -232,7 +231,7 @@ function Column({ column }) {
                     color: (theme) => theme.palette.warning.light,
                     cursor: 'pointer'
                   }}
-                  onClick={toggleOpenNewCardForm}
+                  onMouseDown={toggleOpenNewCardForm}
                 />
               </Box>
             </Box>)
