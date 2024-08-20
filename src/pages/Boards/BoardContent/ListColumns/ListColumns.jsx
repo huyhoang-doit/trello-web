@@ -8,7 +8,7 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
-const ListColumns = ({ columns }) => {
+const ListColumns = ({ columns, createNewColumn, createNewCard }) => {
   /**
    * SortableContext yêu cầu items là một mảng chứa các kiểu dữ liệu nguyên thủy, chứ không phải object
    * Nếu không đúng thì vẫn kéo thả được nhưng không có animation
@@ -21,12 +21,17 @@ const ListColumns = ({ columns }) => {
 
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm(!openNewColumnForm)
 
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if (!newColumnTitle) {
       toast.error('Please enter a new column title')
       return
     }
-    // Call api create new column
+    // Call API
+    const newColumnData = {
+      title: newColumnTitle
+    }
+
+    await createNewColumn(newColumnData)
 
     // Đóng trạng thái
     toggleOpenNewColumnForm()
@@ -48,7 +53,7 @@ const ListColumns = ({ columns }) => {
             '&::-webkit-scrollbar-track': { m: 2 }
           }}>
           {columns.map((column) => (
-            <Column key={column._id} column={column} />
+            <Column key={column._id} column={column} createNewCard={createNewCard} />
           )
           )}
 
