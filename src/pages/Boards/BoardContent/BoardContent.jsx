@@ -30,7 +30,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent({ board, createNewColumn, createNewCard }) {
+function BoardContent({ board, createNewColumn, createNewCard, moveColumns }) {
 
   // https://docs.dndkit.com/api-documentation/sensors
   // Nếu sử dụng PointerSensor mặc định thì phải kết hợp thuộc tính CSS touch-action: none ở những phần tử kéo thả - nhưng còn bug :))
@@ -260,7 +260,7 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
         // Dùng arrayMove của dnd-kit để sắp xếp lại Column ban đầu
         // Code của arrayMove ở đây: dnd-kit/packages/sortable/utilities/arrayMove.ts
 
-        const dndOderedColumns = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
+        const dndOrderedColumns = arrayMove(orderedColumns, oldColumnIndex, newColumnIndex)
 
         // 2 console.log dữ liệu này dùng để xử lý gọi API
         // const dndOderedColumnsIds = dndOderedColumns.map(c => c._id)
@@ -268,7 +268,9 @@ function BoardContent({ board, createNewColumn, createNewCard }) {
         // console.log('dndOderedColumnsIds', dndOderedColumns)
         // console.log('dndOderedColumnsIds', dndOderedColumnsIds)
 
-        setOrderedColumns(dndOderedColumns)
+        moveColumns(dndOrderedColumns)
+
+        setOrderedColumns(dndOrderedColumns)
       }
     }
 
