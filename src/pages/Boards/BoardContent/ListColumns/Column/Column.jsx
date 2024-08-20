@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
 import Menu from '@mui/material/Menu'
@@ -63,7 +64,7 @@ function Column({ column }) {
 
   const addNewCard = () => {
     if (!newCardTitle) {
-      console.error('Please enter a new Card title')
+      toast.error('Please enter a new Card title')
       return
     }
     // Call api create new Card
@@ -212,7 +213,7 @@ function Column({ column }) {
               />
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Button
-                  onClick={addNewCard}
+                  onMouseDown={addNewCard}
                   variant='contained'
                   color='success'
                   size='small'
