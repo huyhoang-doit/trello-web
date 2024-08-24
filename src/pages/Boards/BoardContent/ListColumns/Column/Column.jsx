@@ -22,9 +22,10 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
+import { useConfirm } from 'material-ui-confirm'
 
 
-function Column({ column, createNewCard }) {
+function Column({ column, createNewCard, deleteColumnDetails }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: column._id,
     data: { ...column }
@@ -32,7 +33,7 @@ function Column({ column, createNewCard }) {
 
   const dndKitColumnStyles = {
 
-    // touchAction: 'none', // Dành cho sensor default dạng pointer senser
+    //touchAction: 'none', // Dành cho sensor default dạng pointer senser
     // Nếu sử dụng CSS.Transform như docs thì sẽ lỗi kiểu Stretch
     // https://github.com/clauderic/dnd-kit/issues/117
     transform: CSS.Translate.toString(transform),
@@ -78,6 +79,29 @@ function Column({ column, createNewCard }) {
     setNewCardTitle('')
   }
 
+  const confirmDeleteColumn = useConfirm()
+
+  const handleDeleteColumn = () => {
+
+    confirmDeleteColumn({
+      title: 'Delete Column',
+      description: 'This action will permanently delete your Column and its Cards! Are you sure?',
+      confirmationText: 'Confirm'
+      // allowClose: false,
+      // dialogProps: { maxWidth: 'xs' },
+      // confirmationButtonProps: { color: 'secondary', variant: 'outlined' },
+      // cancellationButtonProps: { color: 'inherit' }
+
+
+    })
+      .then(() => {
+        // Gọi lên props function deleteColumnDetails ở component cha Board.jsx
+        deleteColumnDetails(column._id)
+
+      })
+      .catch(() => { })
+  }
+
   // Phải bọc thẻ div vì vấn đề chiều cao của column khi kéo thả sẽ có bug kiều flickering
   return (
     <div ref={setNodeRef} style={dndKitColumnStyles} {...attributes} >
@@ -119,7 +143,7 @@ function Column({ column, createNewCard }) {
                 aria-controls={open ? 'basic-menu-column-dropdown' : undefined}
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
-                onClick={handleClick}
+                onMouseDown={handleClick}
               />
             </Tooltip>
 
@@ -127,13 +151,21 @@ function Column({ column, createNewCard }) {
               id="basic-menu-column-dropdown"
               anchorEl={anchorEl}
               open={open}
-              onClose={handleClose}
+              onMouseDown={handleClose}
               MenuListProps={{
                 'aria-labelledby': 'basic-column-dropdown'
               }}
             >
-              <MenuItem>
-                <ListItemIcon><AddCardIcon fontSize="small" /></ListItemIcon>
+              <MenuItem
+                sx={{
+                  '&:hover': {
+                    color: 'success.light',
+                    '& .add-card-icon': { color: 'success.light' }
+                  }
+                }}
+                onMouseDown={toggleOpenNewCardForm}
+              >
+                <ListItemIcon><AddCardIcon className='add-card-icon' fontSize="small" /></ListItemIcon>
                 <ListItemText>Add new card</ListItemText>
               </MenuItem>
               <MenuItem>
@@ -153,9 +185,16 @@ function Column({ column, createNewCard }) {
                 <ListItemIcon><Cloud fontSize="small" /></ListItemIcon>
                 <ListItemText>Archive this column</ListItemText>
               </MenuItem>
-              <MenuItem>
-                <ListItemIcon><DeleteIcon fontSize="small" /></ListItemIcon>
-                <ListItemText>Remove this column</ListItemText>
+              <MenuItem
+                onMouseDown={handleDeleteColumn}
+                sx={{
+                  '&:hover': {
+                    color: 'warning.dark',
+                    '& .delete-forever-icon': { color: 'warning.dark' }
+                  }
+                }}>
+                <ListItemIcon><DeleteIcon className='delete-forever-icon' fontSize="small" /></ListItemIcon>
+                <ListItemText>Delete this column</ListItemText>
               </MenuItem>
             </Menu>
           </Box>

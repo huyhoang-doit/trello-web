@@ -8,7 +8,7 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
-const ListColumns = ({ columns, createNewColumn, createNewCard }) => {
+const ListColumns = ({ columns, createNewColumn, createNewCard, deleteColumnDetails }) => {
   /**
    * SortableContext yêu cầu items là một mảng chứa các kiểu dữ liệu nguyên thủy, chứ không phải object
    * Nếu không đúng thì vẫn kéo thả được nhưng không có animation
@@ -52,8 +52,13 @@ const ListColumns = ({ columns, createNewColumn, createNewCard }) => {
             overflowY: 'hidden',
             '&::-webkit-scrollbar-track': { m: 2 }
           }}>
-          {columns.map((column) => (
-            <Column key={column._id} column={column} createNewCard={createNewCard} />
+          {columns?.map((column) => (
+            <Column
+              key={column._id}
+              column={column}
+              createNewCard={createNewCard}
+              deleteColumnDetails={deleteColumnDetails}
+            />
           )
           )}
 
@@ -66,7 +71,7 @@ const ListColumns = ({ columns, createNewColumn, createNewCard }) => {
                 mx: 2,
                 borderRadius: '6px',
                 height: 'fit-content',
-                bgcolor: '#ffffff3d',
+                bgcolor: '#ffffff3d'
 
               }}>
               <Button startIcon={<NoteAddIcon />}
