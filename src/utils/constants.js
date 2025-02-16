@@ -7,7 +7,7 @@ if (process.env.BUILD_MODE === 'dev') {
 }
 
 if (process.env.BUILD_MODE === 'prod') {
-  apiRoot = 'http://trello-api.huyhoangdoit.io.vn'
+  apiRoot = 'http://trello-api.huyhoangdoit.io.vn:8018'
 }
 
 export const API_ROOT = apiRoot
