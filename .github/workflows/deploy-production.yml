@@ -56,7 +56,7 @@ jobs:
             ${{ secrets.ENV_PRODUCTION }}
             EOF
 
-            npm install --force --yes
+            npm install --force
 
             npm run build
 
