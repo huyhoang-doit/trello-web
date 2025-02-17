@@ -59,7 +59,7 @@ jobs:
             npm install --force --yes
 
             # Run production in background
-            nohup npm run production > production.log 2>&1 &
+            nohup npm run preview > production.log 2>&1 &
 
             # Restart PM2
             pm2 restart trello-clone-web --update-env --no-daemon
