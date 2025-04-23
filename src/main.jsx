@@ -8,21 +8,30 @@ import theme from '~/theme'
 import { ConfirmProvider } from 'material-ui-confirm'
 
 import { ToastContainer } from 'react-toastify'
+import { store } from '~/redux/store.js'
+import { Provider } from 'react-redux'
 import 'react-toastify/dist/ReactToastify.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <CssVarsProvider theme={theme}>
-      <ConfirmProvider defaultOptions={{
-        allowClose: false,
-        dialogProps: { maxWidth: 'xs' },
-        confirmationButtonProps: { color: 'secondary', variant: 'outlined' },
-        cancellationButtonProps: { color: 'inherit' }
-      }}>
-        <CssBaseline />
-        <App />
-        <ToastContainer theme="colored" />
-      </ConfirmProvider>
-    </CssVarsProvider>
+    <Provider store={store}>
+      <CssVarsProvider theme={theme}>
+        <ConfirmProvider
+          defaultOptions={{
+            allowClose: false,
+            dialogProps: { maxWidth: 'xs' },
+            confirmationButtonProps: {
+              color: 'secondary',
+              variant: 'outlined'
+            },
+            cancellationButtonProps: { color: 'inherit' }
+          }}
+        >
+          <CssBaseline />
+          <App />
+          <ToastContainer theme="colored" />
+        </ConfirmProvider>
+      </CssVarsProvider>
+    </Provider>
   </React.StrictMode>
 )
