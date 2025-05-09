@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Board from '~/pages/Boards/Boards'
 import NotFound from './pages/404/NotFound'
 import Auth from './pages/Auth/Auth'
+import AccountVerification from './pages/Auth/AccountVerification'
 function App() {
   return (
     <Routes>
@@ -18,6 +19,7 @@ function App() {
       {/* Authentication */}
       <Route path="/login" element={<Auth />} />
       <Route path="/register" element={<Auth />} />
+      <Route path="/account/verify-email" element={<AccountVerification />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
