@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '~/App.jsx'
 import CssBaseline from '@mui/material/CssBaseline'
+import GlobalStyles from '@mui/material/GlobalStyles'
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles'
 import theme from '~/theme'
 import { ToastContainer } from 'react-toastify'
@@ -22,6 +23,10 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 const persistor = persistStore(store)
 
+// Inject store: kỹ thuật inject store vào file này để có thể sử dụng store ở bên ngoài component
+import { injectStore } from '~/utils/authorizeAxios'
+injectStore(store)
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter basename="/">
     <Provider store={store}>
@@ -38,6 +43,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               cancellationButtonProps: { color: 'inherit' }
             }}
           >
+            <GlobalStyles styles={{
+              a: {
+                textDecoration: 'none',
+                color: 'inherit'
+              }
+            }} />
             <CssBaseline />
             <App />
             <ToastContainer theme="colored" />

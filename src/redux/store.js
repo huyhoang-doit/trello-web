@@ -29,5 +29,11 @@ const rootReducers = combineReducers({
 const persistedReducer = persistReducer(rootPersistConfig, rootReducers)
 
 export const store = configureStore({
-  reducer: persistedReducer
+  reducer: persistedReducer,
+  /**
+   * Fix lỗi redux persist không tương thích redux toolkit
+      https://stackoverflow.com/a/63244831
+   */
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false })
 })
