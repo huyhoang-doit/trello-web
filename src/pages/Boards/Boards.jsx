@@ -18,6 +18,7 @@ import {
 } from '~/redux/activeBoard/activeBoardSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import PageLoadingSpinner from '~/components/Loading/PageLoadingSpinner'
 
 function Board() {
   const dispatch = useDispatch()
@@ -112,20 +113,7 @@ function Board() {
   }
 
   if (!board) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          width: '100vh',
-          height: '100vh'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    )
+    return <PageLoadingSpinner caption="Loading board details..." />
   }
   return (
     <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
