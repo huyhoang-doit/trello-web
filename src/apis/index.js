@@ -93,3 +93,10 @@ export const refreshTokenAPI = async () => {
   )
   return response.data
 }
+
+export const fetchBoardsApi = async (searchPath) => {
+  const response = await authorizedAxiosInstance.get(
+    `${API_ROOT}/v1/boards${searchPath}`
+  )
+  return response.data
+}

@@ -35,7 +35,7 @@ const VisuallyHiddenInput = styled('input')({
 function AccountTab() {
   const dispatch = useDispatch()
   const userState = useSelector(selectCurrentUser)
-  const currentUser = userState.user
+  const currentUser = userState
   // Những thông tin của user để init vào form (key tương ứng với register phía dưới Field)
   const initialGeneralForm = {
     displayName: currentUser?.displayName
@@ -51,6 +51,7 @@ function AccountTab() {
     // Nếu không có sự thay đổi gì về displayname thì không làm gì cả
     if (displayName === currentUser?.displayName) return
 
+    // Call API
     toast
       .promise(dispatch(updateProfileAPI({displayName})), {
         pending: 'Updating ...'
@@ -77,10 +78,10 @@ function AccountTab() {
     let reqData = new FormData()
     reqData.append('avatar', e.target?.files[0])
     // Cách để log được dữ liệu thông qua FormData
-    console.log('reqData: ', reqData)
-    for (const value of reqData.values()) {
-      console.log('reqData Value: ', value)
-    }
+    // console.log('reqData: ', reqData)
+    // for (const value of reqData.values()) {
+    //   console.log('reqData Value: ', value)
+    // }
 
     toast
       .promise(dispatch(updateProfileAPI(reqData)), {
@@ -116,7 +117,7 @@ function AccountTab() {
           <Box>
             <Avatar
               sx={{ width: 84, height: 84, mb: 1 }}
-              alt="TrungQuanDev"
+              alt="HuyHoang"
               src={currentUser?.avatar}
             />
             <Tooltip title="Upload a new image to update your avatar immediately.">
@@ -132,7 +133,7 @@ function AccountTab() {
           </Box>
           <Box>
             <Typography variant="h6">{currentUser?.displayName}</Typography>
-            <Typography sx={{ color: 'grey' }}>@{currentUser?.username}</Typography>
+            <Typography sx={{ color: 'grey' }}>{currentUser?.email}</Typography>
           </Box>
         </Box>
 
@@ -141,8 +142,8 @@ function AccountTab() {
             <Box>
               <TextField
                 disabled
-                defaultValue={currentUser?.email}
                 fullWidth
+                value={currentUser?.email}
                 label="Your Email"
                 type="text"
                 variant="filled"
@@ -159,7 +160,7 @@ function AccountTab() {
             <Box>
               <TextField
                 disabled
-                defaultValue={currentUser?.username}
+                value={currentUser?.username}
                 fullWidth
                 label="Your Username"
                 type="text"
@@ -180,6 +181,7 @@ function AccountTab() {
                 label="Your Display Name"
                 type="text"
                 variant="outlined"
+                initialValue={currentUser?.displayName}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
