@@ -23,7 +23,7 @@ function App() {
       <Route
         path="/"
         element={
-          <Navigate to="/boards/66c14c41622f69315ca4e6f1" replace={true} />
+          <Navigate to="/boards/6973c3631ede8dc57c8c1b2f" replace={true} />
         }
       />
 

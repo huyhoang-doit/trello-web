@@ -69,6 +69,21 @@ function LoginForm() {
               <TrelloIcon />
             </Avatar>
           </Box>
+          <Box
+            sx={{
+              margin: '1em',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column',
+              gap: 1
+            }}
+          >
+            <Typography variant="body2" fontSize={'10px'}>Email: huyhoangdoit.171@gmail.com</Typography>
+            <Typography variant="body2" fontSize={'10px'}>
+              Password: Huyho@ng123
+            </Typography>
+          </Box>
 
           <Box
             sx={{
