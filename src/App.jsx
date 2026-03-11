@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import Board from '~/pages/Boards/Boards'
+import Board from '~/pages/Boards/_id'
 import NotFound from './pages/404/NotFound'
 import Auth from './pages/Auth/Auth'
 import AccountVerification from './pages/Auth/AccountVerification'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Settings from '~/pages/Settings/Settings'
+import Boards from './pages/Boards'
 
 const ProtectedRoute = ({ user }) => {
   if (!user) {
@@ -22,13 +23,14 @@ function App() {
       <Route
         path="/"
         element={
-          <Navigate to="/boards/66c14c41622f69315ca4e6f1" replace={true} />
+          <Navigate to="/boards/6973c3631ede8dc57c8c1b2f" replace={true} />
         }
       />
 
       <Route element={<ProtectedRoute user={currentUser} />}>
         {/* Board Details */}
         <Route path="/boards/:boardId" element={<Board />} />
+        <Route path="/boards" element={<Boards />} />
 
         {/* User settings */}
         <Route path="/settings/account" element={<Settings />} />
