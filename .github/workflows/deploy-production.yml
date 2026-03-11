@@ -86,6 +86,9 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm use 22 || export PATH=$HOME/.nvm/versions/node/v22/bin:$PATH
 
+            # Thêm PM2 vào PATH
+            export PATH=$PATH:$(npm bin -g)
+
             cd ~/trello/trello-web
             git fetch --all
             git reset --hard origin/main
@@ -99,7 +102,7 @@ jobs:
             npm run build
 
             # Restart PM2
-            pm2 restart trello-clone-web 
+            pm2 restart trello-clone-web || pm2 start npm --name "trello-clone-web" -- run preview 
             pm2 save
 
       - name: Send Telegram Notification - Deploy Success
