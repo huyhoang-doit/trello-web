@@ -123,8 +123,8 @@ function Boards() {
             {/* Trường hợp gọi API và có boards trong Database trả về thì render danh sách boards */}
             {boards?.length > 0 && (
               <Grid container spacing={2}>
-                {boards.map((b) => (
-                  <Grid xs={2} sm={3} md={4} key={b._id}>
+                {boards.map((b, index) => (
+                  <Grid xs={2} sm={3} md={4} key={index}>
                     <Card sx={{ width: '250px' }}>
                       {/* Ý tưởng mở rộng về sau làm ảnh Cover cho board nhé */}
                       {/* <CardMedia component="img" height="100" image="https://picsum.photos/100" /> */}
