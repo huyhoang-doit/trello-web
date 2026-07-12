@@ -5,9 +5,9 @@
   "type": "module",
   "author": "TrungQuanDev - Một Lập Trình Viên",
   "description": "https://youtube.com/@trungquandev",
-  // "engines": {
-  //   "node": "18.x"
-  // },
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "cross-env BUILD_MODE=dev vite --host",
     "build": "cross-env BUILD_MODE=prod vite build --base=./",
