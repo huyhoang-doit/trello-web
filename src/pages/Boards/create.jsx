@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import Box from '@mui/material/Box'
-import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
-import CancelIcon from '@mui/icons-material/Cancel'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
 import { useForm, Controller } from 'react-hook-form'
 import TextField from '@mui/material/TextField'
 import InputAdornment from '@mui/material/InputAdornment'
@@ -15,6 +17,10 @@ import Button from '@mui/material/Button'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
+import FormLabel from '@mui/material/FormLabel'
+import { createNewBoardAPI } from '~/apis'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 import { styled } from '@mui/material/styles'
 const SidebarItem = styled(Box)(({ theme }) => ({
@@ -34,36 +40,45 @@ const SidebarItem = styled(Box)(({ theme }) => ({
   }
 }))
 
-// BOARD_TYPES tương tự bên model phía Back-end (nếu cần dùng nhiều nơi thì hãy đưa ra file constants, không thì cứ để ở đây)
 const BOARD_TYPES = {
   PUBLIC: 'public',
   PRIVATE: 'private'
 }
 
-/**
- * Bản chất của cái component SidebarCreateBoardModal này chúng ta sẽ trả về một cái SidebarItem để hiển thị ở màn Board List cho phù hợp giao diện bên đó, đồng thời nó cũng chứa thêm một cái Modal để xử lý riêng form create board nhé.
- * Note: Modal là một low-component mà bọn MUI sử dụng bên trong những thứ như Dialog, Drawer, Menu, Popover. Ở đây dĩ nhiên chúng ta có thể sử dụng Dialog cũng không thành vấn đề gì, nhưng sẽ sử dụng Modal để dễ linh hoạt tùy biến giao diện từ con số 0 cho phù hợp với mọi nhu cầu nhé.
- */
-function SidebarCreateBoardModal() {
+function SidebarCreateBoardModal({ afterCreateBoard }) {
   const { control, register, handleSubmit, reset, formState: { errors } } = useForm()
+  const navigate = useNavigate()
 
   const [isOpen, setIsOpen] = useState(false)
   const handleOpenModal = () => setIsOpen(true)
   const handleCloseModal = () => {
     setIsOpen(false)
-    // Reset lại toàn bộ form khi đóng Modal
     reset()
   }
 
-
   const submitCreateNewBoard = (data) => {
     const { title, description, type } = data
-    console.log('Board title: ', title)
-    console.log('Board description: ', description)
-    console.log('Board type: ', type)
+
+    toast.promise(
+      createNewBoardAPI({ title, description, type }),
+      {
+        pending: 'Creating board...',
+        success: 'Board created successfully! 🎉',
+        error: 'Failed to create board. 😢'
+      }
+    ).then((newBoard) => {
+      handleCloseModal()
+      
+      // Nếu có callback để refresh list (trang list board)
+      if (typeof afterCreateBoard === 'function') {
+        afterCreateBoard()
+      }
+
+      // Tự động chuyển hướng vào chi tiết board mới tạo để tăng trải nghiệm
+      navigate(`/boards/${newBoard._id}`)
+    }).catch(() => {})
   }
 
-  // <>...</> nhắc lại cho bạn anof chưa biết hoặc quên nhé: nó là React Fragment, dùng để bọc các phần tử lại mà không cần chỉ định DOM Node cụ thể nào cả.
   return (
     <>
       <SidebarItem onClick={handleOpenModal}>
@@ -71,96 +86,92 @@ function SidebarCreateBoardModal() {
         Create a new board
       </SidebarItem>
 
-      <Modal
+      <Dialog
         open={isOpen}
-        // onClose={handleCloseModal} // chỉ sử dụng onClose trong trường hợp muốn đóng Modal bằng nút ESC hoặc click ra ngoài Modal
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        onClose={handleCloseModal}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            overflow: 'hidden'
+          }
+        }}
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 600,
-          bgcolor: 'white',
-          boxShadow: 24,
-          borderRadius: '8px',
-          border: 'none',
-          outline: 0,
-          padding: '20px 30px',
-          backgroundColor: (theme) => theme.palette.mode === 'dark' ? '#1A2027' : 'white'
-        }}>
-          <Box sx={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
-            cursor: 'pointer'
-          }}>
-            <CancelIcon
-              color="error"
-              sx={{ '&:hover': { color: 'error.light' } }}
-              onClick={handleCloseModal} />
-          </Box>
-          <Box id="modal-modal-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <form onSubmit={handleSubmit(submitCreateNewBoard)}>
+          {/* Header */}
+          <DialogTitle
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              p: 2.5,
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? '#2c3e50' : '#1565c0',
+              color: 'white'
+            }}
+          >
             <LibraryAddIcon />
-            <Typography variant="h6" component="h2"> Create a new board</Typography>
-          </Box>
-          <Box id="modal-modal-description" sx={{ my: 2 }}>
-            <form onSubmit={handleSubmit(submitCreateNewBoard)}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box>
-                  <TextField
-                    fullWidth
-                    label="Title"
-                    type="text"
-                    variant="outlined"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <AbcIcon fontSize="small" />
-                        </InputAdornment>
-                      )
-                    }}
-                    {...register('title', {
-                      required: FIELD_REQUIRED_MESSAGE,
-                      minLength: { value: 3, message: 'Min Length is 3 characters' },
-                      maxLength: { value: 50, message: 'Max Length is 50 characters' }
-                    })}
-                    error={!!errors['title']}
-                  />
-                  <FieldErrorAlert errors={errors} fieldName={'title'} />
-                </Box>
+            <Typography variant="h6" fontWeight={700} component="span">
+              Create new board
+            </Typography>
+          </DialogTitle>
 
-                <Box>
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    type="text"
-                    variant="outlined"
-                    multiline
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <DescriptionOutlinedIcon fontSize="small" />
-                        </InputAdornment>
-                      )
-                    }}
-                    {...register('description', {
-                      required: FIELD_REQUIRED_MESSAGE,
-                      minLength: { value: 3, message: 'Min Length is 3 characters' },
-                      maxLength: { value: 255, message: 'Max Length is 255 characters' }
-                    })}
-                    error={!!errors['description']}
-                  />
-                  <FieldErrorAlert errors={errors} fieldName={'description'} />
-                </Box>
+          {/* Form Content */}
+          <DialogContent sx={{ pt: '24px !important', pb: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+              <Box>
+                <TextField
+                  fullWidth
+                  label="Title"
+                  type="text"
+                  variant="outlined"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <AbcIcon fontSize="small" />
+                      </InputAdornment>
+                    )
+                  }}
+                  {...register('title', {
+                    required: FIELD_REQUIRED_MESSAGE,
+                    minLength: { value: 3, message: 'Min Length is 3 characters' },
+                    maxLength: { value: 50, message: 'Max Length is 50 characters' }
+                  })}
+                  error={!!errors['title']}
+                />
+                <FieldErrorAlert errors={errors} fieldName={'title'} />
+              </Box>
 
-                {/*
-                  * Lưu ý đối với RadioGroup của MUI thì không thể dùng register tương tự TextField được mà phải sử dụng <Controller /> và props "control" của react-hook-form như cách làm dưới đây
-                  * https://stackoverflow.com/a/73336101
-                  * https://mui.com/material-ui/react-radio-button/
-                */}
+              <Box>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  type="text"
+                  variant="outlined"
+                  multiline
+                  rows={3}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DescriptionOutlinedIcon fontSize="small" />
+                      </InputAdornment>
+                    )
+                  }}
+                  {...register('description', {
+                    required: FIELD_REQUIRED_MESSAGE,
+                    minLength: { value: 3, message: 'Min Length is 3 characters' },
+                    maxLength: { value: 255, message: 'Max Length is 255 characters' }
+                  })}
+                  error={!!errors['description']}
+                />
+                <FieldErrorAlert errors={errors} fieldName={'description'} />
+              </Box>
+
+              {/* Board Type Selection */}
+              <Box>
+                <FormLabel component="legend" sx={{ fontSize: '13px', fontWeight: 600, mb: 0.5 }}>
+                  Privacy
+                </FormLabel>
                 <Controller
                   name="type"
                   defaultValue={BOARD_TYPES.PUBLIC}
@@ -175,34 +186,48 @@ function SidebarCreateBoardModal() {
                       <FormControlLabel
                         value={BOARD_TYPES.PUBLIC}
                         control={<Radio size="small" />}
-                        label="Public"
-                        labelPlacement="start"
+                        label="Public (Anyone can see)"
+                        sx={{ '& .MuiFormControlLabel-label': { fontSize: '13px' } }}
                       />
                       <FormControlLabel
                         value={BOARD_TYPES.PRIVATE}
                         control={<Radio size="small" />}
-                        label="Private"
-                        labelPlacement="start"
+                        label="Private (Members only)"
+                        sx={{ '& .MuiFormControlLabel-label': { fontSize: '13px' } }}
                       />
                     </RadioGroup>
                   )}
                 />
-
-                <Box sx={{ alignSelf: 'flex-end' }}>
-                  <Button
-                    className="interceptor-loading"
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                  >
-                    Create
-                  </Button>
-                </Box>
               </Box>
-            </form>
-          </Box>
-        </Box>
-      </Modal>
+            </Box>
+          </DialogContent>
+
+          {/* Action buttons */}
+          <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
+            <Button
+              onClick={handleCloseModal}
+              color="inherit"
+              variant="outlined"
+              sx={{ borderRadius: '8px', textTransform: 'none' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+                bgcolor: '#1565c0',
+                '&:hover': { bgcolor: '#0d47a1' }
+              }}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </>
   )
 }

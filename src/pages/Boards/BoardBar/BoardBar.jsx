@@ -1,16 +1,25 @@
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Chip from '@mui/material/Chip'
+import Tooltip from '@mui/material/Tooltip'
+import Avatar from '@mui/material/Avatar'
+import AvatarGroup from '@mui/material/AvatarGroup'
+import Button from '@mui/material/Button'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import VpnLockIcon from '@mui/icons-material/VpnLock'
 import AddToDriveIcon from '@mui/icons-material/AddToDrive'
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt'
 import FilterListIcon from '@mui/icons-material/FilterList'
-import Avatar from '@mui/material/Avatar'
-import AvatarGroup from '@mui/material/AvatarGroup'
-import Tooltip from '@mui/material/Tooltip'
-import Button from '@mui/material/Button'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { capitalizeFirstLetter } from '~/utils/formatter'
+import InviteUserModal from '~/components/Modal/InviteUserModal'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import { useConfirm } from 'material-ui-confirm'
+import { deleteBoardAPI } from '~/apis'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 const MENU_STYLES = {
   color: 'white',
@@ -18,145 +27,178 @@ const MENU_STYLES = {
   border: 'none',
   paddingX: '5px',
   borderRadius: '4px',
-  '.MuiSvgIcon-root': {
-    color: 'white'
-  },
-  '&:hover': {
-    bgcolor: 'primary.50'
-  }
+  '.MuiSvgIcon-root': { color: 'white' },
+  '&:hover': { bgcolor: 'primary.50' }
 }
+
 function BoardBar({ board }) {
+  const navigate = useNavigate()
+  const confirmDeleteBoard = useConfirm()
+  const currentUser = useSelector(selectCurrentUser)
+  const [openInviteModal, setOpenInviteModal] = useState(false)
+
+  // Gộp owners và members để hiển thị AvatarGroup
+  const boardMembers = [
+    ...(board?.members || [])
+  ]
+
+  // Kiểm tra user hiện tại có phải là Owner của board hay không
+  // Dựa theo board.ownerIds từ backend
+  const isOwner = board?.ownerIds?.some((id) => id === currentUser?._id)
+
+  const handleDeleteBoard = () => {
+    confirmDeleteBoard({
+      title: 'Xóa bảng làm việc?',
+      description: `Hành động này sẽ xóa bảng "${board?.title}". Bạn có chắc chắn muốn tiếp tục?`,
+      confirmationText: 'Xóa',
+      cancellationText: 'Hủy',
+      buttonOrder: ['confirm', 'cancel']
+    }).then(() => {
+      toast.promise(
+        deleteBoardAPI(board._id),
+        {
+          pending: 'Đang xóa bảng...',
+          success: 'Bảng đã được xóa thành công!',
+          error: 'Có lỗi xảy ra khi xóa bảng.'
+        }
+      ).then(() => {
+        // Quay về trang danh sách boards
+        navigate('/boards')
+      })
+    }).catch(() => { })
+  }
+
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: (theme) => theme.trello.boardBarHeight,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 2,
-        paddingX: 2,
-        overflowX: 'auto',
-        '&::-webkit-scrollbar-track': { m: 2 },
-        bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#34495e' : '#1976d2'),
-        borderBottom: '1px solid white'
-      }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Tooltip title={board?.description}>
+    <>
+      <Box
+        sx={{
+          width: '100%',
+          height: (theme) => theme.trello.boardBarHeight,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          paddingX: 2,
+          overflowX: 'auto',
+          '&::-webkit-scrollbar-track': { m: 2 },
+          bgcolor: (theme) =>
+            theme.palette.mode === 'dark' ? '#34495e' : '#1976d2',
+          borderBottom: '1px solid white'
+        }}
+      >
+        {/* Left side */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Tooltip title={board?.description}>
+            <Chip
+              sx={MENU_STYLES}
+              icon={<DashboardIcon />}
+              label={board?.title}
+              clickable
+            />
+          </Tooltip>
           <Chip
             sx={MENU_STYLES}
-            icon={<DashboardIcon />}
-            label={board?.title}
+            icon={<VpnLockIcon />}
+            label={capitalizeFirstLetter(board?.type || 'public')}
             clickable
           />
-        </Tooltip>
+          <Chip
+            sx={MENU_STYLES}
+            icon={<AddToDriveIcon />}
+            label="Add To Google Drive"
+            clickable
+          />
+          <Chip
+            sx={MENU_STYLES}
+            icon={<OfflineBoltIcon />}
+            label="Automation"
+            clickable
+          />
+          <Chip
+            sx={MENU_STYLES}
+            icon={<FilterListIcon />}
+            label="Filters"
+            clickable
+          />
+        </Box>
 
-        <Chip
-          sx={MENU_STYLES}
-          icon={<VpnLockIcon />}
-          label={capitalizeFirstLetter(board?.type)}
-          clickable
-        />
-        <Chip
-          sx={MENU_STYLES}
-          icon={<AddToDriveIcon />}
-          label="Add To Google Drive"
-          clickable
-        />
-        <Chip
-          sx={MENU_STYLES}
-          icon={<OfflineBoltIcon />}
-          label="Automation"
-          clickable
-        />
-        <Chip
-          sx={MENU_STYLES}
-          icon={<FilterListIcon />}
-          label="Filters"
-          clickable
-        />
+        {/* Right side */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Nút Xóa Board - Chỉ hiển thị cho Owner */}
+          {isOwner && (
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteBoard}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                whiteSpace: 'nowrap',
+                '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
+              }}
+            >
+              Delete Board
+            </Button>
+          )}
+
+          {/* Nút Invite - Chỉ hiển thị cho Owner */}
+          {isOwner && (
+            <Button
+              variant="outlined"
+              startIcon={<PersonAddIcon />}
+              onClick={() => setOpenInviteModal(true)}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                whiteSpace: 'nowrap',
+                '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
+              }}
+            >
+              Invite
+            </Button>
+          )}
+
+          {/* Avatar Group - hiển thị real members từ API */}
+          <AvatarGroup
+            max={7}
+            sx={{
+              '& .MuiAvatar-root': {
+                width: 34,
+                height: 34,
+                fontSize: '14px',
+                border: '2px solid white',
+                cursor: 'pointer',
+                '&:first-of-type': { bgcolor: '#a4b0be' }
+              }
+            }}
+          >
+            {boardMembers.map((member) => (
+              <Tooltip key={member._id} title={member.displayName || member.email}>
+                <Avatar
+                  alt={member.displayName}
+                  src={member.avatar}
+                  sx={{
+                    bgcolor: !member.avatar
+                      ? `hsl(${member.email?.charCodeAt(0) * 5 % 360}, 60%, 50%)`
+                      : undefined
+                  }}
+                >
+                  {!member.avatar && (member.displayName?.charAt(0) || member.email?.charAt(0))?.toUpperCase()}
+                </Avatar>
+              </Tooltip>
+            ))}
+          </AvatarGroup>
+        </Box>
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Button
-          variant="outlined"
-          startIcon={<PersonAddIcon />}
-          sx={{
-            color: 'white',
-            borderColor: 'white',
-            '&:hover': {
-              borderColor: 'white'
-            }
-          }}
-        >Invite
-        </Button>
-        <AvatarGroup
-          max={7}
-          sx={{
-            '& .MuiAvatar-root': {
-              width: 34,
-              height: 34,
-              fontSize: '16px',
-              border: 'none',
-              color: 'white',
-              cursor: 'pointer',
-              '&:first-of-type': { bgcolor: '#a4b0be' }
-            }
-          }
-          }
-        >
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://samkyvuong.vn/wp-content/uploads/2022/05/girl-xinh.jpg.webp" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://luv.vn/wp-content/uploads/2022/07/gai-tay-dep-37.jpg" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://samkyvuong.vn/wp-content/uploads/2022/05/gai-tay-lanh-lung.jpg.webp" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://kenh14cdn.com/2018/10/1/screen-shot-2018-10-01-at-95956-pm-15384061286081927130003.png" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://cdn.mozart.edu.vn/wp-content/uploads/2024/04/hinh-gai-dep-goi-cam-1.jpg" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_lSLxbc54btHJlYfrHfQR9j4p8eXr8DQVU5zmxCpOCkczXKnKnq5_kUuT7rRhrVWAqwY&usqp=CAU" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://cdn.mozart.edu.vn/wp-content/uploads/2024/04/hinh-gai-dep-goi-cam-1.jpg" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_lSLxbc54btHJlYfrHfQR9j4p8eXr8DQVU5zmxCpOCkczXKnKnq5_kUuT7rRhrVWAqwY&usqp=CAU" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://cdn.mozart.edu.vn/wp-content/uploads/2024/04/hinh-gai-dep-goi-cam-1.jpg" />
-          </Tooltip>
-          <Tooltip title='HuyHoang-doit'>
-            <Avatar
-              alt="huyhoang-doit"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_lSLxbc54btHJlYfrHfQR9j4p8eXr8DQVU5zmxCpOCkczXKnKnq5_kUuT7rRhrVWAqwY&usqp=CAU" />
-          </Tooltip>
-        </AvatarGroup>
-      </Box>
-    </Box >
+
+      {/* Invite Modal */}
+      <InviteUserModal
+        open={openInviteModal}
+        onClose={() => setOpenInviteModal(false)}
+        board={board}
+      />
+    </>
   )
 }
 

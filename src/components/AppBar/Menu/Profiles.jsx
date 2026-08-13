@@ -31,9 +31,8 @@ const Profiles = () => {
     confirmLogout({
       title: 'Logout',
       description: 'Are you sure you want to logout?',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
-      
+      confirmationText: 'Logout',
+      cancellationText: 'Cancel'
     }).then(()=> {
       dispatch(logoutUserAPI(true))
     })

@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentUser, updateProfileAPI } from '~/redux/user/userSlice'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
+import { useEffect } from 'react'
 
 // Xử lý custom đẹp cái input file ở đây: https://mui.com/material-ui/react-button/#file-upload
 // Ngoài ra note thêm lib này từ docs của MUI nó recommend nếu cần dùng: https://github.com/viclafouch/mui-file-input
@@ -34,16 +35,26 @@ const VisuallyHiddenInput = styled('input')({
 
 function AccountTab() {
   const dispatch = useDispatch()
-  const userState = useSelector(selectCurrentUser)
-  const currentUser = userState
+  const currentUser = useSelector(selectCurrentUser)
+  console.log("userstate: ", currentUser)
+  
   // Những thông tin của user để init vào form (key tương ứng với register phía dưới Field)
   const initialGeneralForm = {
-    displayName: currentUser?.displayName
+    displayName: currentUser?.displayName || ''
   }
   // Sử dụng defaultValues để set giá trị mặc định cho các field cần thiết
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: initialGeneralForm
   })
+
+  // Tự động cập nhật lại các trường form khi currentUser load thành công hoặc thay đổi
+  useEffect(() => {
+    if (currentUser) {
+      reset({
+        displayName: currentUser.displayName || ''
+      })
+    }
+  }, [currentUser, reset])
 
   const submitChangeGeneralInformation = (data) => {
     const { displayName } = data
@@ -53,7 +64,7 @@ function AccountTab() {
 
     // Call API
     toast
-      .promise(dispatch(updateProfileAPI({displayName})), {
+      .promise(dispatch(updateProfileAPI({ displayName })), {
         pending: 'Updating ...'
       })
       .then((res) => {
@@ -143,7 +154,7 @@ function AccountTab() {
               <TextField
                 disabled
                 fullWidth
-                value={currentUser?.email}
+                value={currentUser?.email || ''}
                 label="Your Email"
                 type="text"
                 variant="filled"
@@ -160,7 +171,7 @@ function AccountTab() {
             <Box>
               <TextField
                 disabled
-                value={currentUser?.username}
+                value={currentUser?.username || ''}
                 fullWidth
                 label="Your Username"
                 type="text"
@@ -181,7 +192,6 @@ function AccountTab() {
                 label="Your Display Name"
                 type="text"
                 variant="outlined"
-                initialValue={currentUser?.displayName}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">

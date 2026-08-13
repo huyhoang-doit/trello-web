@@ -25,6 +25,21 @@ export const updateBoardDetailsAPI = async (boardId, updateData) => {
   return response.data
 }
 
+export const createNewBoardAPI = async (boardData) => {
+  const response = await authorizedAxiosInstance.post(
+    `${API_ROOT}/v1/boards`,
+    boardData
+  )
+  return response.data
+}
+
+export const deleteBoardAPI = async (boardId) => {
+  const response = await authorizedAxiosInstance.delete(
+    `${API_ROOT}/v1/boards/${boardId}`
+  )
+  return response.data
+}
+
 export const moveCardToDifferentColumnAPI = async (updateData) => {
   const response = await authorizedAxiosInstance.put(
     `${API_ROOT}/v1/boards/supports/moving_card`,

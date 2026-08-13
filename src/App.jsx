@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Settings from '~/pages/Settings/Settings'
 import Boards from './pages/Boards'
+import { useEffect } from 'react'
+import { connectSocket, disconnectSocket } from '~/utils/socket'
 
 const ProtectedRoute = ({ user }) => {
   if (!user) {
@@ -17,6 +19,18 @@ const ProtectedRoute = ({ user }) => {
 
 function App() {
   const currentUser = useSelector(selectCurrentUser)
+
+  // Kết nối socket khi user đăng nhập, ngắt kết nối khi logout
+  useEffect(() => {
+    if (currentUser?._id) {
+      connectSocket(currentUser._id)
+    } else {
+      disconnectSocket()
+    }
+    return () => {
+      disconnectSocket()
+    }
+  }, [currentUser])
 
   return (
     <Routes>
