@@ -21,7 +21,7 @@ export const loginUserAPI = createAsyncThunk(
   }
 )
 
-export const updateProfileAPI  = createAsyncThunk(
+export const updateProfileAPI = createAsyncThunk(
   'user/updateProfileAPI',
   async (data) => {
     const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/users/update-profile`, data)
@@ -51,16 +51,17 @@ export const userSlice = createSlice({
   // Nơi xử lý dữ liệu bất đồng bộ
   extraReducers: (builder) => {
     builder.addCase(loginUserAPI.fulfilled, (state, action) => {
+      console.log("action:", action)
       // action.payload là response.data từ API
-      let user = action.payload
+      let user = action.payload?.user
       state.currentUser = user
     }),
-    builder.addCase(logoutUserAPI.fulfilled, (state, action) => {
-      state.currentUser = null
-    }),
-    builder.addCase(updateProfileAPI.fulfilled, (state, action) => {
-      state.currentUser = action.payload
-    })
+      builder.addCase(logoutUserAPI.fulfilled, (state, action) => {
+        state.currentUser = null
+      }),
+      builder.addCase(updateProfileAPI.fulfilled, (state, action) => {
+        state.currentUser = action.payload
+      })
   }
 })
 

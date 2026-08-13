@@ -3,12 +3,10 @@ import Box from '@mui/material/Box'
 import ModeSelect from '~/components/ModeSelect/ModeSelect'
 import AppsIcon from '@mui/icons-material/Apps'
 import SvgIcon from '@mui/material/SvgIcon'
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import Badge from '@mui/material/Badge'
 import TextField from '@mui/material/TextField'
 import Workspaces from './Menu/Workspaces'
 import Recent from './Menu/Recent'
@@ -16,11 +14,13 @@ import Started from './Menu/Started'
 import Templates from './Menu/Templates'
 import Tooltip from '@mui/material/Tooltip'
 import Profiles from './Menu/Profiles'
+import Notifications from './Menu/Notifications'
 import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 import { Link } from 'react-router-dom'
+
 function AppBar() {
   const [searchValue, setSearchValue] = useState('')
   return (
@@ -123,11 +123,8 @@ function AppBar() {
           }}
         />
         <ModeSelect />
-        <Tooltip title="Notifications">
-          <Badge color="warning" variant="dot" sx={{ cursor: 'pointer' }}>
-            <NotificationsNoneIcon sx={{ color: 'white' }} />
-          </Badge>
-        </Tooltip>
+        {/* Notifications Bell với Dropdown - thay thế Badge tĩnh cũ */}
+        <Notifications />
         <Tooltip title="Help">
           <HelpOutlineIcon sx={{ cursor: 'pointer', color: 'white' }} />
         </Tooltip>

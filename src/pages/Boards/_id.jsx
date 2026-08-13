@@ -1,7 +1,9 @@
 import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
 import AppBar from '~/components/AppBar/AppBar'
 import BoardBar from './BoardBar/BoardBar'
 import BoardContent from './BoardContent/BoardContent'
+import BoardSidebar from '~/components/BoardSidebar/BoardSidebar'
 import { useEffect } from 'react'
 import {
   updateBoardDetailsAPI,
@@ -9,7 +11,6 @@ import {
   moveCardToDifferentColumnAPI
 } from '~/apis'
 import { cloneDeep } from 'lodash'
-import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import {
   fetchBoardDetailsAPI,
@@ -22,109 +23,89 @@ import PageLoadingSpinner from '~/components/Loading/PageLoadingSpinner'
 
 function Board() {
   const dispatch = useDispatch()
-  // const [board, setBoard] = useState(null)
   const board = useSelector(selectCurrentActiveBoard)
   const { boardId } = useParams()
-  // '66c14c41622f69315ca4e6f1'
 
   useEffect(() => {
-    // react-router-dom
-
-    // Call api
     dispatch(fetchBoardDetailsAPI(boardId))
   }, [dispatch, boardId])
 
-  // Call API xử lý khi kéo thả Column, cập nhật lại columnOrderIds của Board đó
   const moveColumns = (dndOrderedColumns) => {
     const dndOderedColumnsIds = dndOrderedColumns.map((c) => c._id)
-
-    // Update board
     const newBoard = { ...board }
     newBoard.columns = dndOrderedColumns
     newBoard.columnOrderIds = dndOderedColumnsIds
     dispatch(updateCurrentActiveBoard(newBoard))
-
-    // Call API update board
-    updateBoardDetailsAPI(newBoard._id, {
-      columnOrderIds: newBoard.columnOrderIds
-    })
+    updateBoardDetailsAPI(newBoard._id, { columnOrderIds: newBoard.columnOrderIds })
   }
 
-  // Call API xử lý khi kéo thả Card
-  // Khi di chuyển trong 1 column thì gọi API cập nhật lại cardOrderIds của Column đó
-  const moveCardInTheSameColumn = (
-    dndOrderedCards,
-    dndOrderedCardIds,
-    columnId
-  ) => {
-    // Update board
-    // const newBoard = { ...board }
+  const moveCardInTheSameColumn = (dndOrderedCards, dndOrderedCardIds, columnId) => {
     const newBoard = cloneDeep(board)
-    const columnToUpdate = newBoard.columns.find(
-      (column) => column._id === columnId
-    )
+    const columnToUpdate = newBoard.columns.find((c) => c._id === columnId)
     if (columnToUpdate) {
       columnToUpdate.cards = dndOrderedCards
       columnToUpdate.cardOrderIds = dndOrderedCardIds
     }
     dispatch(updateCurrentActiveBoard(newBoard))
-
-    // Call API update board
     updateColumnDetailsAPI(columnId, { cardOrderIds: dndOrderedCardIds })
   }
 
-  /**
-   * Khi di chuyển card sang column khác:
-   * B1: Cập nhật mảng cardOrderIds của Column ban đầu chứa nó
-   * B2: Cập nhật mảng cardOrderIds của Column tiếp theo
-   * B3: Cập nhật lại columnId của Card đã kéo
-   */
-  const moveCardToDifferentColumn = (
-    currentCardId,
-    prevColumnId,
-    nextColumnId,
-    dndOrderedColumns
-  ) => {
+  const moveCardToDifferentColumn = (currentCardId, prevColumnId, nextColumnId, dndOrderedColumns) => {
     const dndOderedColumnsIds = dndOrderedColumns.map((c) => c._id)
-
-    // Update board
     const newBoard = { ...board }
     newBoard.columns = dndOrderedColumns
     newBoard.columnOrderIds = dndOderedColumnsIds
     dispatch(updateCurrentActiveBoard(newBoard))
 
-    // Xử lý vấn đề khi kéo card cuối cùng ra khỏi column, check placeholder-card FE
-    let prevCardOrderIds = dndOrderedColumns.find(
-      (c) => c._id === prevColumnId
-    )?.cardOrderIds
+    let prevCardOrderIds = dndOrderedColumns.find((c) => c._id === prevColumnId)?.cardOrderIds
     if (prevCardOrderIds[0].includes('placeholder-card')) {
       prevCardOrderIds = []
     }
 
-    // Call API
     moveCardToDifferentColumnAPI({
       currentCardId,
       prevColumnId,
       prevCardOrderIds,
       nextColumnId,
-      nextCardOrderIds: dndOrderedColumns.find((c) => c._id === nextColumnId)
-        ?.cardOrderIds
+      nextCardOrderIds: dndOrderedColumns.find((c) => c._id === nextColumnId)?.cardOrderIds
     })
   }
 
   if (!board) {
     return <PageLoadingSpinner caption="Loading board details..." />
   }
+
   return (
-    <Container disableGutters maxWidth={false} sx={{ height: '100vh' }}>
+    <Container disableGutters maxWidth={false} sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* AppBar */}
       <AppBar />
+
+      {/* BoardBar */}
       <BoardBar board={board} />
-      <BoardContent
-        board={board}
-        moveColumns={moveColumns}
-        moveCardInTheSameColumn={moveCardInTheSameColumn}
-        moveCardToDifferentColumn={moveCardToDifferentColumn}
-      />
+
+      {/* Main content area: BoardContent + Sidebar */}
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'row',
+          overflow: 'hidden',
+          position: 'relative'
+        }}
+      >
+        {/* Kanban board content */}
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <BoardContent
+            board={board}
+            moveColumns={moveColumns}
+            moveCardInTheSameColumn={moveCardInTheSameColumn}
+            moveCardToDifferentColumn={moveCardToDifferentColumn}
+          />
+        </Box>
+
+        {/* Sidebar - mặc định đóng */}
+        <BoardSidebar board={board} />
+      </Box>
     </Container>
   )
 }
