@@ -11,8 +11,15 @@ import AddToDriveIcon from '@mui/icons-material/AddToDrive'
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { capitalizeFirstLetter } from '~/utils/formatter'
 import InviteUserModal from '~/components/Modal/InviteUserModal'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import { useConfirm } from 'material-ui-confirm'
+import { deleteBoardAPI } from '~/apis'
+import { toast } from 'react-toastify'
+import { useNavigate } from 'react-router-dom'
 
 const MENU_STYLES = {
   color: 'white',
@@ -25,13 +32,41 @@ const MENU_STYLES = {
 }
 
 function BoardBar({ board }) {
+  const navigate = useNavigate()
+  const confirmDeleteBoard = useConfirm()
+  const currentUser = useSelector(selectCurrentUser)
   const [openInviteModal, setOpenInviteModal] = useState(false)
 
   // Gộp owners và members để hiển thị AvatarGroup
   const boardMembers = [
-    ...(board?.owners || []),
     ...(board?.members || [])
   ]
+
+  // Kiểm tra user hiện tại có phải là Owner của board hay không
+  // Dựa theo board.ownerIds từ backend
+  const isOwner = board?.ownerIds?.some((id) => id === currentUser?._id)
+
+  const handleDeleteBoard = () => {
+    confirmDeleteBoard({
+      title: 'Xóa bảng làm việc?',
+      description: `Hành động này sẽ xóa bảng "${board?.title}". Bạn có chắc chắn muốn tiếp tục?`,
+      confirmationText: 'Xóa',
+      cancellationText: 'Hủy',
+      buttonOrder: ['confirm', 'cancel']
+    }).then(() => {
+      toast.promise(
+        deleteBoardAPI(board._id),
+        {
+          pending: 'Đang xóa bảng...',
+          success: 'Bảng đã được xóa thành công!',
+          error: 'Có lỗi xảy ra khi xóa bảng.'
+        }
+      ).then(() => {
+        // Quay về trang danh sách boards
+        navigate('/boards')
+      })
+    }).catch(() => { })
+  }
 
   return (
     <>
@@ -64,7 +99,7 @@ function BoardBar({ board }) {
           <Chip
             sx={MENU_STYLES}
             icon={<VpnLockIcon />}
-            label={capitalizeFirstLetter(board?.type)}
+            label={capitalizeFirstLetter(board?.type || 'public')}
             clickable
           />
           <Chip
@@ -89,19 +124,40 @@ function BoardBar({ board }) {
 
         {/* Right side */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<PersonAddIcon />}
-            onClick={() => setOpenInviteModal(true)}
-            sx={{
-              color: 'white',
-              borderColor: 'white',
-              whiteSpace: 'nowrap',
-              '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
-            }}
-          >
-            Invite
-          </Button>
+          {/* Nút Xóa Board - Chỉ hiển thị cho Owner */}
+          {isOwner && (
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteBoard}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                whiteSpace: 'nowrap',
+                '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
+              }}
+            >
+              Delete Board
+            </Button>
+          )}
+
+          {/* Nút Invite - Chỉ hiển thị cho Owner */}
+          {isOwner && (
+            <Button
+              variant="outlined"
+              startIcon={<PersonAddIcon />}
+              onClick={() => setOpenInviteModal(true)}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                whiteSpace: 'nowrap',
+                '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
+              }}
+            >
+              Invite
+            </Button>
+          )}
 
           {/* Avatar Group - hiển thị real members từ API */}
           <AvatarGroup

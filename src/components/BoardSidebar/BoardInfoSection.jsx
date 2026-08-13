@@ -15,7 +15,6 @@ import GroupIcon from '@mui/icons-material/Group'
 
 function BoardInfoSection({ board }) {
   const allMembers = [
-    ...(board?.owners || []),
     ...(board?.members || [])
   ]
 
