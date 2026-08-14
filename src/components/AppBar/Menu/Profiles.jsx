@@ -29,11 +29,11 @@ const Profiles = () => {
   const confirmLogout = useConfirm()
   const handleLogout = () => {
     confirmLogout({
-      title: 'Logout',
-      description: 'Are you sure you want to logout?',
-      confirmationText: 'Logout',
-      cancellationText: 'Cancel'
-    }).then(()=> {
+      title: 'Đăng xuất',
+      description: 'Bạn có chắc chắn muốn đăng xuất?',
+      confirmationText: 'Đăng xuất',
+      cancellationText: 'Huỷ'
+    }).then(() => {
       dispatch(logoutUserAPI(true))
     })
   }
@@ -72,7 +72,7 @@ const Profiles = () => {
               color: 'success.light'
             }
           }}>
-            <Avatar sx={{ width: 28, height: 28, marginRight: 2 }}  src={currentUser?.avatar}/> Profile
+            <Avatar sx={{ width: 28, height: 28, marginRight: 2 }} src={currentUser?.avatar} /> Profile
           </MenuItem>
         </Link>
         <Divider />
@@ -95,11 +95,11 @@ const Profiles = () => {
               color: 'warning.dark'
             }
           }
-        }} 
-        onClick={handleLogout}
+        }}
+          onClick={handleLogout}
         >
           <ListItemIcon>
-            <Logout fontSize="small" className='logout-icon'/>
+            <Logout fontSize="small" className='logout-icon' />
           </ListItemIcon>
           Logout
         </MenuItem>

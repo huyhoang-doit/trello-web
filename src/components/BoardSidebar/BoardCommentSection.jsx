@@ -52,7 +52,7 @@ function BoardCommentSection({ boardId }) {
         // Scroll về cuối ngay (không smooth) khi load lần đầu
         setTimeout(() => scrollToBottom(false), 50)
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setIsLoading(false))
   }, [boardId, scrollToBottom])
 

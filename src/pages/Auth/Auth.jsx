@@ -65,7 +65,7 @@ function Auth() {
               sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#90caf9' : '#0c66e4', width: '36px', height: '36px' }}
             />
             <Typography variant="h5" fontWeight={800} sx={{ color: (theme) => theme.palette.mode === 'dark' ? '#fff' : '#0c66e4', tracking: '0.05em' }}>
-              TRELLO CLONE
+              Trello Clone
             </Typography>
           </Box>
 

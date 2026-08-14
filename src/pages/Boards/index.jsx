@@ -27,6 +27,7 @@ import { fetchBoardsApi } from '~/apis'
 import { styled } from '@mui/material/styles'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import moment from 'moment'
+import theme from '~/theme'
 
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -51,7 +52,7 @@ function Boards() {
   const [boards, setBoards] = useState(null)
   const [totalBoards, setTotalBoards] = useState(null)
   const location = useLocation()
-  
+
   const query = new URLSearchParams(location.search)
   const page = parseInt(query.get('page') || '1', 10)
 
@@ -70,25 +71,19 @@ function Boards() {
     return <PageLoadingSpinner caption="Đang tải danh sách bảng..." />
   }
 
-  const getGradientColor = (title = '') => {
-    const code = title.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
-    const angle = code % 360
-    return `linear-gradient(${angle}deg, #1565c0 0%, #00d2ff 100%)`
-  }
-
   return (
-    <Container 
-      disableGutters 
-      maxWidth={false} 
-      sx={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
+    <Container
+      disableGutters
+      maxWidth={false}
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
         flexDirection: 'column',
-        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#f4f6f8' 
+        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#121212' : '#f4f6f8'
       }}
     >
       <AppBar />
-      
+
       {/* Vùng Content chính */}
       <Box sx={{ px: { xs: 2, md: 4 }, py: 4, flex: 1 }}>
         <Grid container spacing={3}>
@@ -97,15 +92,15 @@ function Boards() {
             <Stack direction="column" spacing={1.5}>
               <SidebarItem className="active">
                 <SpaceDashboardIcon fontSize="small" />
-                <Typography variant="body2" fontWeight={600}>Bảng làm việc</Typography>
+                <Typography variant="body2" fontWeight={500}>Bảng làm việc</Typography>
               </SidebarItem>
               <SidebarItem>
                 <ListAltIcon fontSize="small" />
-                <Typography variant="body2" fontWeight={600}>Mẫu có sẵn</Typography>
+                <Typography variant="body2" fontWeight={500}>Mẫu có sẵn</Typography>
               </SidebarItem>
               <SidebarItem>
                 <HomeIcon fontSize="small" />
-                <Typography variant="body2" fontWeight={600}>Trang chủ</Typography>
+                <Typography variant="body2" fontWeight={500}>Trang chủ</Typography>
               </SidebarItem>
             </Stack>
             <Divider sx={{ my: 2 }} />
@@ -135,16 +130,17 @@ function Boards() {
 
             {/* List Boards */}
             {boards?.length > 0 && (
-              // Bắt buộc sử dụng alignItems="stretch" để các Grid con kéo dãn chiều cao bằng nhau
-              <Grid container spacing={3} sx={{ alignItems: 'stretch' }}>
+              <Grid container spacing={2}>
                 {boards.map((b) => {
-                  const memberCount = (b.ownerIds?.length || 0) + (b.memberIds?.length || 0)
+                  const memberCount = (b.memberIds?.length || 0)
                   return (
-                    <Grid xs={12} sm={6} md={4} key={b._id} sx={{ display: 'flex', width: '100%' }}>
+                    <Grid xs={12} sm={6} md={4} key={b._id} sx={{ display: 'flex', width: '100%', minWidth: 0 }}>
                       <Card
                         sx={{
-                          width: '100%',
-                          height: '280px', // Cố định chiều cao card 280px
+                          width: '250px',
+                          minWidth: 0,
+                          overflow: 'hidden',
+                          height: '280px',
                           display: 'flex',
                           flexDirection: 'column',
                           borderRadius: 1,
@@ -164,7 +160,8 @@ function Boards() {
                         <Box
                           sx={{
                             height: '80px',
-                            background: getGradientColor(b.title),
+                            background: (theme) =>
+                              theme.palette.mode === 'dark' ? '#2c3e50' : '#1565c0',
                             display: 'flex',
                             alignItems: 'flex-start',
                             justifyContent: 'flex-end',
@@ -180,9 +177,7 @@ function Boards() {
 
                         {/* Content */}
                         <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                          {/* Box chứa text trên: dùng flexGrow: 1 để tự động chiếm hết khoảng trống */}
-                          <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-                            {/* Tiêu đề: Đặt minHeight cố định để dù 1 hay 2 dòng vẫn bằng nhau */}
+                          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                             <Typography
                               gutterBottom
                               variant="subtitle1"
@@ -193,9 +188,7 @@ function Boards() {
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
-                                lineHeight: 1.3,
-                                minHeight: '38px', // Cố định chiều cao tương đương 2 dòng chữ
-                                mb: 1
+                                lineHeight: 1.3
                               }}
                             >
                               {b.title}
@@ -214,7 +207,6 @@ function Boards() {
                                 WebkitBoxOrient: 'vertical',
                                 lineHeight: 1.5,
                                 fontSize: '13px',
-                                minHeight: '39px' // Cố định chiều cao tương đương 2 dòng chữ
                               }}
                             >
                               {b.description || 'Không có mô tả cho bảng làm việc này.'}

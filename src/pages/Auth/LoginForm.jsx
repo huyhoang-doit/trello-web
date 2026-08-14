@@ -57,7 +57,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit(submitLogIn)} style={{ width: '100%' }}>
       <Box sx={{ mb: 2.5, textAlign: 'center' }}>
-        <Typography variant="h5" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary' }}>
+        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary' }}>
           Đăng nhập
         </Typography>
         <Typography variant="caption" color="text.secondary">
@@ -186,7 +186,7 @@ function LoginForm() {
             fontSize: '15px',
             fontWeight: 800,
             boxShadow: 'none',
-            '&:hover': { 
+            '&:hover': {
               boxShadow: 'none',
               bgcolor: 'primary.dark'
             }

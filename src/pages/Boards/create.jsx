@@ -68,7 +68,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
       }
     ).then((newBoard) => {
       handleCloseModal()
-      
+
       // Nếu có callback để refresh list (trang list board)
       if (typeof afterCreateBoard === 'function') {
         afterCreateBoard()
@@ -76,15 +76,25 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
 
       // Tự động chuyển hướng vào chi tiết board mới tạo để tăng trải nghiệm
       navigate(`/boards/${newBoard._id}`)
-    }).catch(() => {})
+    }).catch(() => { })
   }
 
   return (
     <>
-      <SidebarItem onClick={handleOpenModal}>
-        <LibraryAddIcon fontSize="small" />
-        Create a new board
-      </SidebarItem>
+      {/* <SidebarItem onClick={handleOpenModal}> */}
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<LibraryAddIcon />}
+        onClick={handleOpenModal}
+        sx={{
+          whiteSpace: 'nowrap',
+        }}
+      >
+        Tạo bảng mới
+      </Button>
+      {/* </SidebarItem> */}
+
 
       <Dialog
         open={isOpen}
@@ -93,7 +103,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: '16px',
+            borderRadius: 1,
             overflow: 'hidden'
           }
         }}
@@ -112,7 +122,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
           >
             <LibraryAddIcon />
             <Typography variant="h6" fontWeight={700} component="span">
-              Create new board
+              Tạo bảng làm việc mới
             </Typography>
           </DialogTitle>
 
@@ -122,7 +132,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
               <Box>
                 <TextField
                   fullWidth
-                  label="Title"
+                  label="Tên bảng"
                   type="text"
                   variant="outlined"
                   InputProps={{
@@ -145,7 +155,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
               <Box>
                 <TextField
                   fullWidth
-                  label="Description"
+                  label="Mô tả"
                   type="text"
                   variant="outlined"
                   multiline
@@ -170,7 +180,7 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
               {/* Board Type Selection */}
               <Box>
                 <FormLabel component="legend" sx={{ fontSize: '13px', fontWeight: 600, mb: 0.5 }}>
-                  Privacy
+                  Quyền riêng tư
                 </FormLabel>
                 <Controller
                   name="type"
@@ -186,13 +196,13 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
                       <FormControlLabel
                         value={BOARD_TYPES.PUBLIC}
                         control={<Radio size="small" />}
-                        label="Public (Anyone can see)"
+                        label="Công khai (Bất kỳ ai cũng có thể xem)"
                         sx={{ '& .MuiFormControlLabel-label': { fontSize: '13px' } }}
                       />
                       <FormControlLabel
                         value={BOARD_TYPES.PRIVATE}
                         control={<Radio size="small" />}
-                        label="Private (Members only)"
+                        label="Riêng tư (Chỉ thành viên)"
                         sx={{ '& .MuiFormControlLabel-label': { fontSize: '13px' } }}
                       />
                     </RadioGroup>
@@ -208,22 +218,20 @@ function SidebarCreateBoardModal({ afterCreateBoard }) {
               onClick={handleCloseModal}
               color="inherit"
               variant="outlined"
-              sx={{ borderRadius: '8px', textTransform: 'none' }}
+              sx={{ borderRadius: 1 }}
             >
-              Cancel
+              Huỷ
             </Button>
             <Button
               type="submit"
               variant="contained"
               sx={{
-                borderRadius: '8px',
+                borderRadius: 1,
                 textTransform: 'none',
-                fontWeight: 600,
-                bgcolor: '#1565c0',
-                '&:hover': { bgcolor: '#0d47a1' }
+                fontWeight: 500,
               }}
             >
-              Create
+              Tạo bảng
             </Button>
           </DialogActions>
         </form>
