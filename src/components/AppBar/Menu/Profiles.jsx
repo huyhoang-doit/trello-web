@@ -50,7 +50,7 @@ const Profiles = () => {
         >
           <Avatar
             sx={{ width: 34, height: 34 }}
-            src={currentUser?.avatar || 'https://avatars.githubusercontent.com/u/139938101?v=4'}
+            src={currentUser?.avatar || (currentUser?.displayName?.charAt(0)?.toUpperCase() || currentUser?.email?.charAt(0)?.toUpperCase())}
             alt="huyhoang-doit"
           />
         </IconButton>
