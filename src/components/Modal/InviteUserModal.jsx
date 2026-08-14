@@ -128,7 +128,7 @@ function InviteUserModal({ open, onClose, board }) {
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '16px',
+          borderRadius: 1,
           overflow: 'hidden'
         }
       }}
@@ -181,21 +181,21 @@ function InviteUserModal({ open, onClose, board }) {
 
         {/* User not found */}
         {notFound && !isSearching && (
-          <Alert severity="warning" sx={{ mb: 2, borderRadius: '10px' }}>
+          <Alert severity="warning" sx={{ mb: 2, borderRadius: 1 }}>
             Không tìm thấy người dùng với email này, hoặc tài khoản chưa được xác minh.
           </Alert>
         )}
 
         {/* Already member */}
         {isAlreadyMember && (
-          <Alert severity="info" sx={{ mb: 2, borderRadius: '10px' }}>
+          <Alert severity="info" sx={{ mb: 2, borderRadius: 1 }}>
             Người này đã là thành viên của board.
           </Alert>
         )}
 
         {/* Invite success */}
         {invitedSuccess && (
-          <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 2, borderRadius: '10px' }}>
+          <Alert severity="success" icon={<CheckCircleIcon />} sx={{ mb: 2, borderRadius: 1 }}>
             Lời mời đã được gửi thành công!
           </Alert>
         )}
@@ -212,7 +212,7 @@ function InviteUserModal({ open, onClose, board }) {
                 alignItems: 'center',
                 gap: 1.5,
                 p: 1.5,
-                borderRadius: '12px',
+                borderRadius: 1,
                 border: '2px solid',
                 borderColor: 'primary.main',
                 bgcolor: 'primary.50'
@@ -249,7 +249,7 @@ function InviteUserModal({ open, onClose, board }) {
           onClick={handleClose}
           color="inherit"
           variant="outlined"
-          sx={{ borderRadius: '8px', textTransform: 'none' }}
+          sx={{ borderRadius: 1 }}
         >
           Đóng
         </Button>
@@ -259,11 +259,8 @@ function InviteUserModal({ open, onClose, board }) {
           disabled={!foundUser || isAlreadyMember || isInviting || invitedSuccess}
           onClick={handleInvite}
           sx={{
-            borderRadius: '8px',
-            textTransform: 'none',
-            fontWeight: 600,
-            bgcolor: '#1565c0',
-            '&:hover': { bgcolor: '#0d47a1' }
+            borderRadius: 1,
+            fontWeight: 500,
           }}
         >
           {invitedSuccess ? 'Đã gửi' : 'Gửi lời mời'}

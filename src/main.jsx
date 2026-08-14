@@ -35,12 +35,25 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <ConfirmProvider
             defaultOptions={{
               allowClose: false,
-              dialogProps: { maxWidth: 'xs' },
-              confirmationButtonProps: {
-                color: 'secondary',
-                variant: 'outlined'
+              dialogProps: { 
+                maxWidth: 'xs',
+                PaperProps: {
+                  sx: {
+                    borderRadius: 1 // Sử dụng mặc định theme (4px)
+                  }
+                }
               },
-              cancellationButtonProps: { color: 'inherit' }
+              buttonOrder: ['cancel', 'confirm'], // Phù hợp chuẩn UX (nút Cancel trước, Confirm sau)
+              confirmationButtonProps: {
+                color: 'primary',
+                variant: 'contained',
+                sx: { borderRadius: 1 }
+              },
+              cancellationButtonProps: { 
+                color: 'inherit',
+                variant: 'outlined',
+                sx: { borderRadius: 1 }
+              }
             }}
           >
             <GlobalStyles styles={{

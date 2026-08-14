@@ -50,9 +50,10 @@ function BoardBar({ board }) {
     confirmDeleteBoard({
       title: 'Xóa bảng làm việc?',
       description: `Hành động này sẽ xóa bảng "${board?.title}". Bạn có chắc chắn muốn tiếp tục?`,
-      confirmationText: 'Xóa',
       cancellationText: 'Hủy',
-      buttonOrder: ['confirm', 'cancel']
+      confirmationText: 'Xóa',
+
+      buttonOrder: ['cancel', 'confirm']
     }).then(() => {
       toast.promise(
         deleteBoardAPI(board._id),

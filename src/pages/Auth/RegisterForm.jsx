@@ -52,7 +52,7 @@ function RegisterForm() {
   return (
     <form onSubmit={handleSubmit(submitRegister)} style={{ width: '100%' }}>
       <Box sx={{ mb: 2.5, textAlign: 'center' }}>
-        <Typography variant="h5" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary' }}>
+        <Typography variant="h6" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary' }}>
           Đăng ký tài khoản
         </Typography>
         <Typography variant="caption" color="text.secondary">
@@ -189,7 +189,7 @@ function RegisterForm() {
             fontSize: '15px',
             fontWeight: 800,
             boxShadow: 'none',
-            '&:hover': { 
+            '&:hover': {
               boxShadow: 'none',
               bgcolor: 'primary.dark'
             }
