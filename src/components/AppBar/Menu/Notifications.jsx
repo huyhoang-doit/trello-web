@@ -201,36 +201,46 @@ function Notifications() {
         {/* Notification list */}
         {Array.isArray(notifications) && notifications.map((notification, index) => {
           const isPending = notification?.boardInvitation?.status === 'pending'
-          const inviter = notification?.details?.inviter
-          const board = notification?.details?.board
+          const inviter = notification?.inviter
+          const board = notification?.board
           const boardId = notification?.boardInvitation?.boardId
 
           return (
-            <Box key={notification._id || index}>
-              <MenuItem
-                sx={{
-                  py: 1.5,
-                  px: 2,
-                  alignItems: 'flex-start',
-                  gap: 1.5,
-                  bgcolor: isPending ? 'action.hover' : 'transparent',
-                  '&:hover': { bgcolor: 'action.selected' }
-                }}
+            <MenuItem
+              key={notification._id || index}
+              sx={{
+                py: 1.5,
+                px: 2,
+                alignItems: 'flex-start',
+                gap: 1.5,
+                bgcolor: isPending ? 'action.hover' : 'transparent',
+                '&:hover': { bgcolor: 'action.selected' }
+              }}
+            >
+              {/* Avatar của người invite */}
+              <Avatar
+                src={inviter?.avatar}
+                alt={inviter?.displayName}
+                sx={{ width: 38, height: 38, mt: 0.5, flexShrink: 0 }}
               >
-                {/* Avatar của người invite */}
-                <Avatar
-                  src={inviter?.avatar}
-                  alt={inviter?.displayName}
-                  sx={{ width: 38, height: 38, mt: 0.5, flexShrink: 0 }}
-                >
-                  {inviter?.displayName?.charAt(0)?.toUpperCase()}
-                </Avatar>
+                {inviter?.displayName?.charAt(0)?.toUpperCase()}
+              </Avatar>
 
-                {/* Nội dung notification */}
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+              {/* Nội dung notification */}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Tooltip
+                  title={`${inviter?.displayName || inviter?.email || 'Người dùng'} đã mời bạn tham gia board "${board?.title || 'Bảng'}"`}
+                  placement="top"
+                  arrow
+                >
                   <Typography
                     variant="body2"
-                    sx={{ lineHeight: 1.4, mb: 0.5 }}
+                    sx={{
+                      lineHeight: 1.4,
+                      mb: 0.5,
+                      whiteSpace: 'normal', // Ép text tự xuống dòng
+                      wordBreak: 'break-word' // Tránh lỗi từ dài làm tràn dòng
+                    }}
                   >
                     <Typography
                       component="span"
@@ -249,49 +259,48 @@ function Notifications() {
                       "{board?.title}"
                     </Typography>
                   </Typography>
+                </Tooltip>
 
-                  {/* Timestamp */}
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                    {moment(notification.createdAt).locale('vi').fromNow()}
-                  </Typography>
+                {/* Timestamp */}
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  {moment(notification.createdAt).locale('vi').fromNow()}
+                </Typography>
 
-                  {/* Action buttons hoặc status chip */}
-                  {isPending ? (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        color="success"
-                        sx={{ fontSize: '12px', py: 0.3, textTransform: 'none', borderRadius: '6px' }}
-                        startIcon={<CheckCircleOutlineIcon fontSize="small" />}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleUpdateInvitation(notification._id, 'accepted', boardId)
-                        }}
-                      >
-                        Chấp nhận
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        sx={{ fontSize: '12px', py: 0.3, textTransform: 'none', borderRadius: '6px' }}
-                        startIcon={<HighlightOffIcon fontSize="small" />}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleUpdateInvitation(notification._id, 'declined', boardId)
-                        }}
-                      >
-                        Từ chối
-                      </Button>
-                    </Box>
-                  ) : (
-                    <InvitationStatusChip status={notification?.boardInvitation?.status} />
-                  )}
-                </Box>
-              </MenuItem>
-              {index < notifications.length - 1 && <Divider sx={{ my: 0 }} />}
-            </Box>
+                {/* Action buttons hoặc status chip */}
+                {isPending ? (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="success"
+                      sx={{ fontSize: '12px', py: 0.3, textTransform: 'none', borderRadius: '6px' }}
+                      startIcon={<CheckCircleOutlineIcon fontSize="small" />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleUpdateInvitation(notification._id, 'accepted', boardId)
+                      }}
+                    >
+                      Chấp nhận
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      sx={{ fontSize: '12px', py: 0.3, textTransform: 'none', borderRadius: '6px' }}
+                      startIcon={<HighlightOffIcon fontSize="small" />}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleUpdateInvitation(notification._id, 'declined', boardId)
+                      }}
+                    >
+                      Từ chối
+                    </Button>
+                  </Box>
+                ) : (
+                  <InvitationStatusChip status={notification?.boardInvitation?.status} />
+                )}
+              </Box>
+            </MenuItem>
           )
         })}
 
