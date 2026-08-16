@@ -28,7 +28,7 @@ import { joinBoardRoom, leaveBoardRoom } from '~/utils/socket'
 const SIDEBAR_WIDTH = 300
 
 function BoardSidebar({ board }) {
-  const [open, setOpen] = useState(false) // Mặc định ĐÓNG
+  const [open, setOpen] = useState(true) // Mặc định ĐÓNG
 
   // Join/leave board socket room khi component mount/unmount
   useEffect(() => {
