@@ -7,7 +7,8 @@ if (process.env.BUILD_MODE === 'dev') {
 }
 
 if (process.env.BUILD_MODE === 'prod') {
-  apiRoot = 'https://trello-api.lvhhoangg.io.vn'
+  // apiRoot = 'https://trello-api.lvhhoangg.io.vn'
+  apiRoot = 'https://trello-api-brqm.onrender.com'
 }
 
 export const DEFAULT_PAGE = 1
